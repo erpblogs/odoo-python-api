@@ -42,141 +42,34 @@ employee_info = models.execute_kw(db, uid, password,
                                       ],
                                       'limit': 1
                                   })
-employee_skill_ids = []
-employee_programming_ids = []
-employee_certificate_ids = []
 
 if employee_info:
-    employee_skill_ids = employee_info[0]['employee_skill_ids']
-    employee_programming_ids = employee_info[0]['employee_programming_ids']
-    employee_certificate_ids = employee_info[0]['employee_certificate_ids']
+    employee_skill_ids = employee_info[0]['employee_skill_ids'] or []
+    employee_programming_ids = employee_info[0]['employee_programming_ids'] or []
+    employee_certificate_ids = employee_info[0]['employee_certificate_ids'] or []
 
-emp_skill_info = models.execute_kw(db, uid, password,
-                                   'hr.employee.skill',
-                                   'search_read',
-                                   [[('id', 'in', employee_skill_ids)]],
-                                   {
-                                       'fields': [
-                                           'skill_id',
-                                           'level',
-                                       ]
-                                   })
-
-print("\nSkill info", emp_skill_info)
-
-emp_programming_info = models.execute_kw(db, uid, password,
-                                         'hr.employee.skill',
-                                         'search_read',
-                                         [[('id', 'in', employee_skill_ids)]],
-                                         {
-                                             'fields': [
-                                                 'skill_id',
-                                                 'level',
-                                             ]
-                                         })
-print("\nProgramming info", emp_programming_info)
-
-emp_certificate_info = models.execute_kw(db, uid, password,
-                                         'hr.employee.certificate',
-                                         'search_read',
-                                         [[('id', 'in', employee_certificate_ids)]],
-                                         {
-                                             'fields': [
-                                                 'certificate_id',
-                                                 'level',
-                                             ]
-                                         })
-print("\nCertificate info", emp_certificate_info)
-
-# get all skill
-emp_skill = models.execute_kw(db, uid, password,
-                              'hr.skill',
-                              'search_read',
-                              [[('type', '=', 'skill')]],
-                              {
-                                  'fields': [
-                                      'id',
-                                      'name',
-                                  ]
-                              })
-
-print('\nemp skill', emp_skill)
-
-# get programming skill
-emp_programming = models.execute_kw(db, uid, password,
-                                    'hr.skill',
-                                    'search_read',
-                                    [[('type', '=', 'programming')]],
-                                    {
-                                        'fields': [
-                                            'id',
-                                            'name',
-                                        ]
-                                    })
-
-print('\nprogramming skill', emp_programming)
-
-# get all certificate
-emp_certificate = models.execute_kw(db, uid, password,
-                                    'hr.certificate',
-                                    'search_read', [],
-                                    {
-                                        'fields': [
-                                            'id',
-                                            'name',
-                                        ]
-                                    })
-
-print('\nemp certificate', emp_certificate)
-
-# create employee skill:
+# unlink employee skill:
 employee_id = models.execute_kw(db, uid, password, 'hr.employee', 'search',
                                 [[('work_email', '=', 'quang.trinhvan@vti.com.vn')]], {'limit': 1})
+if len(employee_skill_ids) > 0:
+    emp_skill_id = employee_skill_ids[0]
+    print(employee_skill_ids)
 
-skill_id = [2]  # get skill id from emp_skill
-level = [1]  # level 0-3
+    # unlink
+    models.execute_kw(db, uid, password, 'hr.employee.skill', 'unlink', [[emp_skill_id]])
+#
+# unlink employee programming:
+if len(employee_programming_ids) > 0:
+    emp_programming_id = employee_programming_ids[0]
+    print(employee_programming_ids)
 
-create_skill_info = {
-    'employee_id': employee_id[0],
-    'skill_id': skill_id[0],
-    'level': '1', #[('0', 'Junior')],
-    'type': 'skill'
-}
+    # unlink
+    models.execute_kw(db, uid, password, 'hr.employee.skill', 'unlink', [[emp_programming_id]])
 
-# create
-models.execute_kw(db, uid, password, 'hr.employee.skill', 'create', [create_skill_info])
+# unlink employee certificate:
+if len(employee_certificate_ids) > 0:
+    employee_certificate_id = employee_certificate_ids[0]
+    print(employee_certificate_ids)
 
-# create emp programming:
-employee_id = models.execute_kw(db, uid, password, 'hr.employee', 'search',
-                                [[('work_email', '=', 'quang.trinhvan@vti.com.vn')]], {'limit': 1})
-
-programming_id = [2]  # get skill id from emp_programming
-level = [1]  # level 0-3
-
-create_programming_info = {
-    'employee_id': employee_id[0],
-    'skill_id': programming_id[0],
-    'level': '1', #[('0', 'Junior')],
-    'type': 'programming'
-}
-
-# create
-models.execute_kw(db, uid, password, 'hr.employee.skill', 'create', [create_programming_info])
-
-# create emp certificate:
-employee_id = models.execute_kw(db, uid, password, 'hr.employee', 'search',
-                                [[('work_email', '=', 'quang.trinhvan@vti.com.vn')]], {'limit': 1})
-
-
-certificate_id = [2]  # get skill id from emp_certificate
-file_save = ""
-firle_name = 'chung chi aws'
-create_certificate_info = {
-    'employee_id': employee_id[0],
-    'certificate_id': certificate_id[0],
-    'file_name': firle_name,
-    'file_save': file_save
-}
-
-# update
-models.execute_kw(db, uid, password, 'hr.employee.certificate', 'create', [create_certificate_info])
+    # unlink
+    models.execute_kw(db, uid, password, 'hr.employee.certificate', 'unlink', [[employee_certificate_id]])
