@@ -1,0 +1,4 @@
+dbname=vti11
+username=admin
+pwd=admin
+server=http://localhost:8069

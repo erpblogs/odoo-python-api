@@ -4,7 +4,7 @@ import inspect
 
 def get_odoo_config_path():
     directory_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-    return os.path.join(directory_path, 'odoo_config.txt')
+    return os.path.join(directory_path, 'odoo_config_local.txt')
 
 def get_odoo_config():
     open_file = open(get_odoo_config_path(), 'r')
